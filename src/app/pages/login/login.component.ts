@@ -6,12 +6,13 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
-import { AuthService } from '../../../../services/auth.service';
+import { Router } from '@angular/router';
+import { AccountService } from '../../services/account.service';
 
 @Component({
-  selector: 'app-login-card',
-  imports: [CommonModule, ReactiveFormsModule, RouterLink],
+  selector: 'app-login',
+  standalone: true,
+  imports: [CommonModule, ReactiveFormsModule],
   template: `<div class="mb-6 text-center">
       <h2 class="text-2xl font-bold text-green-600">Sign in</h2>
       <p class="mt-2 text-sm text-gray-600">
@@ -69,13 +70,13 @@ import { AuthService } from '../../../../services/auth.service';
     </form>`,
   styles: ``,
 })
-export class LoginCardComponent implements OnInit {
+export class LoginComponent implements OnInit {
   form: FormGroup;
   isSubmitted: boolean = false;
 
   constructor(
     private formBuilder: FormBuilder, // Changed to private for consistency
-    private service: AuthService,
+    private service: AccountService,
     private router: Router
   ) {
     // Initialize the form here
@@ -102,13 +103,14 @@ export class LoginCardComponent implements OnInit {
   onSubmit() {
     this.isSubmitted = true;
     if (this.form.valid) {
-      this.service.signin(this.form.value).subscribe({
+      this.service.signIn(this.form.value).subscribe({
         next: (res: any) => {
-          this.service.saveToken(res.token);
-          this.router.navigateByUrl('/store/products');
+          console.log('Login success, response:', res);
+          this.service.saveToken(res.accessToken); // Ensure this matches the backend key
+          this.router.navigateByUrl('');
         },
         error: (err: any) => {
-          console.error(err);
+          console.error('Login failed:', err);
         },
       });
     }

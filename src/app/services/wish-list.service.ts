@@ -7,8 +7,8 @@ import { AccountService } from './account.service';
 @Injectable({
   providedIn: 'root',
 })
-export class CartService {
-  private baseUrl = `${environment.apiBaseUrl}/api/Cart`;
+export class WishListService {
+  private baseUrl = `${environment.apiBaseUrl}/api/Wishlist`;
 
   constructor(
     private http: HttpClient,
@@ -23,23 +23,21 @@ export class CartService {
     return userId;
   }
 
-  getCart(): Observable<{ items: any[] }> {
+  getWishlist(): Observable<{ items: any[] }> {
     const userId = this.getUserIdOrThrow();
     return this.http.get<{ items: any[] }>(`${this.baseUrl}/${userId}`);
   }
 
-  addToCart(cartItem: {
+  addToWishlist(wishlistItem: {
     productId: number;
-    quantity: number;
-    price: number;
     title: string;
     image: string;
   }): Observable<any> {
     const userId = this.getUserIdOrThrow();
-    return this.http.post(`${this.baseUrl}/${userId}/add`, cartItem);
+    return this.http.post(`${this.baseUrl}/${userId}/add`, wishlistItem);
   }
 
-  removeFromCart(productId: number): Observable<any> {
+  removeFromWishlist(productId: number): Observable<any> {
     const userId = this.getUserIdOrThrow();
     return this.http.delete(`${this.baseUrl}/${userId}/remove/${productId}`);
   }
