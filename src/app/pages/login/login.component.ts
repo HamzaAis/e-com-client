@@ -14,12 +14,18 @@ import { AccountService } from '../../services/account.service';
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
   template: `<div class="mb-6 text-center">
-      <h2 class="text-2xl font-bold text-green-600">Sign in</h2>
+      <button
+        class="text-lg font-semibold hover:underline"
+        (click)="navigateTo('/')"
+      >
+        MyStore
+      </button>
+      <h2 class="text-2xl font-bold text-blue-600">Sign in</h2>
       <p class="mt-2 text-sm text-gray-600">
         Don't have an account?
         <a
-          routerLink="/register"
-          class="text-green-600 hover:underline font-medium"
+          (click)="navigateTo('/register')"
+          class="text-blue-600 hover:underline font-medium"
         >
           Sign up
         </a>
@@ -28,7 +34,7 @@ import { AccountService } from '../../services/account.service';
     <form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-4">
       <div>
         <input
-          class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+          class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           placeholder="username"
           formControlName="username"
         />
@@ -45,7 +51,7 @@ import { AccountService } from '../../services/account.service';
       <div>
         <input
           type="password"
-          class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+          class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           placeholder="Password"
           formControlName="password"
         />
@@ -62,7 +68,7 @@ import { AccountService } from '../../services/account.service';
       <div class="mt-6">
         <button
           type="submit"
-          class="w-full px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500"
+          class="w-full px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
           Sign in
         </button>
@@ -114,5 +120,9 @@ export class LoginComponent implements OnInit {
         },
       });
     }
+  }
+
+  navigateTo(path: string) {
+    this.router.navigate([path]);
   }
 }

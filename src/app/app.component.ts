@@ -1,16 +1,24 @@
+import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { FooterComponent } from './components/footer/footer.component';
 import { NavbarComponent } from './components/navbar/navbar.component';
-import { CommonModule } from '@angular/common';
+import { ToastComponent } from './components/toast/toast.component';
 
 @Component({
   selector: 'app-root',
 
-  imports: [RouterOutlet, NavbarComponent, FooterComponent, CommonModule],
+  imports: [
+    RouterOutlet,
+    ToastComponent,
+    NavbarComponent,
+    FooterComponent,
+    CommonModule,
+  ],
   template: `
     <app-navbar *ngIf="showNavbar"></app-navbar>
     <router-outlet></router-outlet>
+    <app-toast />
     <app-footer *ngIf="showFooter"></app-footer>
   `,
   styles: [],
