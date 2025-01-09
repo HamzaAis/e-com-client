@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Component, OnInit } from '@angular/core';
 import { ItemCardComponent } from '../../../components/item-card/item-card.component';
 import { CartService } from '../../../services/cart.service';
+import { ToastService } from '../../../services/toast.service';
 
 @Component({
   selector: 'app-cart',
@@ -33,7 +34,10 @@ import { CartService } from '../../../services/cart.service';
 export class CartComponent implements OnInit {
   cartItems: any[] = [];
 
-  constructor(private cartService: CartService) {}
+  constructor(
+    private cartService: CartService,
+    private toastService: ToastService
+  ) {}
 
   ngOnInit(): void {
     this.loadCartItems();
@@ -48,14 +52,21 @@ export class CartComponent implements OnInit {
     });
   }
 
-  handleRemoveFromCart(item: any) {
-    this.cartService.removeFromCart(item.productId).subscribe({
-      next: () => {
-        this.cartItems = this.cartItems.filter(
-          (i) => i.productId !== item.productId
-        );
-      },
-      error: (err) => console.error('Failed to remove item from cart', err),
-    });
-  }
+handleRemoveFromCart(item: any) {
+  this.cartService.removeFromCart(item.productId).subscribe({
+    next: () => {
+      this.cartItems = this.cartItems.filter(
+        (i) => i.productId !== item.productId
+      );
+      // No success toast here, already handled in ItemCardComponent
+    },
+    error: (err) => {
+      console.error('Failed to remove item from cart', err);
+      this.toastService.showToast({
+        message: 'Failed to remove item from the cart.',
+        type: 'error',
+      });
+    },
+  });
+}
 }

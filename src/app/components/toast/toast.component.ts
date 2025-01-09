@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
-import { ToastService } from '../../services/toast.service';
+import { Toast, ToastService } from '../../services/toast.service';
 
 @Component({
   selector: 'app-toast',
@@ -9,11 +9,11 @@ import { ToastService } from '../../services/toast.service';
   template: `
     <div class="fixed bottom-4 right-4 space-y-2 z-50">
       <div
-        *ngFor="let toast of toasts"
+        *ngFor="let toast of toasts$ | async"
         [class]="getToastClass(toast.type)"
-        class="p-4 rounded shadow-lg text-white"
+        class="p-4 rounded shadow-lg text-white flex justify-between items-center"
       >
-        {{ toast.message }}
+        <span>{{ toast.message }}</span>
         <button
           class="text-white ml-4"
           (click)="dismissToast(toast)"
@@ -42,17 +42,17 @@ import { ToastService } from '../../services/toast.service';
   ],
 })
 export class ToastComponent {
-  toasts: any;
+  toasts$;
 
   constructor(private toastService: ToastService) {
-    this.toasts = this.toastService.toasts$;
+    this.toasts$ = this.toastService.toasts$;
   }
 
   getToastClass(type: string): string {
     return `toast-${type}`;
   }
 
-  dismissToast(toast: any) {
+  dismissToast(toast: Toast) {
     this.toastService.dismissToast(toast);
   }
 }

@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { AccountService } from '../../services/account.service';
+import { ToastService } from '../../services/toast.service';
 
 @Component({
   selector: 'app-navbar',
@@ -70,7 +71,11 @@ import { AccountService } from '../../services/account.service';
 export class NavbarComponent {
   isLoggedIn: boolean = false;
 
-  constructor(private accountService: AccountService, private router: Router) {
+  constructor(
+    private accountService: AccountService,
+    private toastService: ToastService,
+    private router: Router
+  ) {
     // Subscribe to login state
     this.accountService.isLoggedIn$.subscribe((status) => {
       this.isLoggedIn = status;
@@ -83,6 +88,12 @@ export class NavbarComponent {
 
   logout() {
     this.accountService.deleteToken();
+    this.toastService.showToast({
+      message: 'Logged out successfully.',
+      type: 'info',
+    });
+    console.log('Toast triggered: Logged out successfully!');
+
     this.router.navigate(['/']);
   }
 }

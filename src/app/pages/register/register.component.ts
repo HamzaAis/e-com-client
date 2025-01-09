@@ -11,6 +11,7 @@ import {
 import { Router } from '@angular/router';
 import { FirstKeyPipe } from '../../pipes/first-key.pipe';
 import { AccountService } from '../../services/account.service';
+import { ToastService } from '../../services/toast.service';
 
 @Component({
   selector: 'app-register',
@@ -169,6 +170,7 @@ export class RegisterComponent {
   constructor(
     private formBuilder: FormBuilder,
     private service: AccountService,
+    private toastService: ToastService,
     private router: Router
   ) {
     this.form = this.formBuilder.group(
@@ -224,40 +226,38 @@ export class RegisterComponent {
   onSubmit() {
     this.isSubmitted = true;
     if (this.form.valid) {
-      const {
-        firstName,
-        lastName,
-        username,
-        phoneNumber,
-        email,
-        password,
-        confirmPassword,
-      } = this.form.value;
+      this.service.signUp(this.form.value).subscribe({
+        next: () => {
+          this.toastService.showToast({
+            message: 'Registration successful! Please log in.',
+            type: 'success',
+          });
+          console.log(
+            'Toast triggered: Registration successful! Please log in!'
+          );
 
-      this.service
-        .signUp({
-          firstName,
-          lastName,
-          username,
-          phoneNumber,
-          email,
-          password,
-          confirmPassword,
-        })
-        .subscribe({
-          next: (res: any) => {
-            if (res.succeeded) {
-              this.form.reset();
-              this.isSubmitted = false;
-              this.router.navigateByUrl('/login');
-            }
-          },
-          error: (err: any) => {
-            console.error('Registration error', err);
-          },
-        });
+          this.router.navigateByUrl('/login');
+        },
+        error: (err: any) => {
+          this.toastService.showToast({
+            message: 'Registration failed. Please try again.',
+            type: 'error',
+          });
+          console.error('Registration error:', err);
+          console.log(
+            'Toast triggered: Registration failed. Please try again!'
+          );
+        },
+      });
+    } else {
+      this.toastService.showToast({
+        message: 'Please fill in all required fields.',
+        type: 'warning',
+      });
+      console.log('Toast triggered: Please fill in all required fields!');
     }
   }
+
   navigateTo(path: string) {
     this.router.navigate([path]);
   }

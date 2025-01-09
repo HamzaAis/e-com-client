@@ -8,12 +8,14 @@ import {
 } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AccountService } from '../../services/account.service';
+import { ToastService } from '../../services/toast.service';
 
 @Component({
   selector: 'app-login',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
-  template: `<div class="mb-6 text-center">
+  template: `
+    <div class="mb-6 text-center">
       <button
         class="text-lg font-semibold hover:underline"
         (click)="navigateTo('/')"
@@ -73,19 +75,20 @@ import { AccountService } from '../../services/account.service';
           Sign in
         </button>
       </div>
-    </form>`,
-  styles: ``,
+    </form>
+  `,
+  styles: [],
 })
 export class LoginComponent implements OnInit {
   form: FormGroup;
   isSubmitted: boolean = false;
 
   constructor(
-    private formBuilder: FormBuilder, // Changed to private for consistency
+    private formBuilder: FormBuilder,
     private service: AccountService,
+    private toastService: ToastService,
     private router: Router
   ) {
-    // Initialize the form here
     this.form = this.formBuilder.group({
       username: ['', Validators.required],
       password: ['', Validators.required],
@@ -94,7 +97,7 @@ export class LoginComponent implements OnInit {
 
   ngOnInit(): void {
     if (this.service.isLoggedIn()) {
-      this.router.navigateByUrl('/store/products');
+      this.router.navigateByUrl('/');
     }
   }
 
@@ -111,13 +114,32 @@ export class LoginComponent implements OnInit {
     if (this.form.valid) {
       this.service.signIn(this.form.value).subscribe({
         next: (res: any) => {
-          console.log('Login success, response:', res);
-          this.service.saveToken(res.accessToken); // Ensure this matches the backend key
-          this.router.navigateByUrl('');
+          this.service.saveToken(res.accessToken);
+
+          // Trigger the toast notification
+          const username = this.service.getUsername();
+          const userId = this.service.getUserId();
+          if (username && userId) {
+            this.toastService.showToast({
+              message: `Logged in as ${username} (ID: ${userId}).`,
+              type: 'success',
+            });
+          }
+
+          this.router.navigateByUrl('/');
         },
         error: (err: any) => {
-          console.error('Login failed:', err);
+          this.toastService.showToast({
+            message: 'Login failed. Please check your credentials.',
+            type: 'error',
+          });
+          console.error('Login error:', err);
         },
+      });
+    } else {
+      this.toastService.showToast({
+        message: 'Please fill in all required fields.',
+        type: 'warning',
       });
     }
   }

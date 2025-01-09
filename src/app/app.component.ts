@@ -17,8 +17,8 @@ import { ToastComponent } from './components/toast/toast.component';
   ],
   template: `
     <app-navbar *ngIf="showNavbar"></app-navbar>
-    <router-outlet></router-outlet>
     <app-toast />
+    <router-outlet></router-outlet>
     <app-footer *ngIf="showFooter"></app-footer>
   `,
   styles: [],

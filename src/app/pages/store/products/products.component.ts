@@ -3,6 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { CardComponent } from '../../../components/card/card.component';
 import { CartService } from '../../../services/cart.service';
 import { ProductService } from '../../../services/product.service';
+import { ToastService } from '../../../services/toast.service';
 import { WishListService } from '../../../services/wish-list.service';
 
 @Component({
@@ -32,6 +33,7 @@ export class ProductsComponent implements OnInit {
 
   constructor(
     private productService: ProductService,
+    private toastService: ToastService,
     private cartService: CartService,
     private wishListService: WishListService
   ) {}
@@ -53,14 +55,22 @@ export class ProductsComponent implements OnInit {
     this.cartService
       .addToCart({
         productId: product.id,
-        quantity: 1, // Default to 1 for now
+        quantity: 1,
         price: product.price,
-        title: product.title, // New Field
-        image: product.img, // New Field
+        title: product.title,
+        image: product.img,
       })
       .subscribe({
-        next: () => console.log(`Added ${product.title} to the cart!`),
-        error: (err) => console.error('Failed to add to cart', err),
+        next: () => {
+          // No success toast here, already handled in CardComponent
+        },
+        error: (err) => {
+          console.error('Failed to add to cart', err);
+          this.toastService.showToast({
+            message: `Failed to add ${product.title} to the cart.`,
+            type: 'error',
+          });
+        },
       });
   }
 
@@ -68,12 +78,20 @@ export class ProductsComponent implements OnInit {
     this.wishListService
       .addToWishlist({
         productId: product.id,
-        title: product.title, // New Field
-        image: product.img, // New Field
+        title: product.title,
+        image: product.img,
       })
       .subscribe({
-        next: () => console.log(`Added ${product.title} to the wishlist!`),
-        error: (err) => console.error('Failed to add to wishlist', err),
+        next: () => {
+          // No success toast here, already handled in CardComponent
+        },
+        error: (err) => {
+          console.error('Failed to add to wishlist', err);
+          this.toastService.showToast({
+            message: `Failed to add ${product.title} to the wishlist.`,
+            type: 'error',
+          });
+        },
       });
   }
 }

@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { ToastService } from '../../services/toast.service';
 import { ButtonComponent } from '../button/button.component';
 
 @Component({
@@ -24,12 +25,12 @@ import { ButtonComponent } from '../button/button.component';
       <div class="p-4 flex space-x-2">
         <app-button
           variant="primary"
-          (onClick)="addToCart.emit()"
+          (onClick)="onAddToCart()"
           [disabled]="stock === 0"
         >
           Add to Cart
         </app-button>
-        <app-button variant="secondary" (onClick)="addToWishlist.emit()">
+        <app-button variant="secondary" (onClick)="onAddToWishlist()">
           Add to Wishlist
         </app-button>
       </div>
@@ -43,6 +44,26 @@ export class CardComponent {
   @Input() price: number = 0;
   @Input() stock: number = 0;
 
+  constructor(private toastService: ToastService) {}
+
   @Output() addToCart = new EventEmitter<void>();
   @Output() addToWishlist = new EventEmitter<void>();
+
+  onAddToCart() {
+    if (this.stock > 0) {
+      this.addToCart.emit();
+      this.toastService.showToast({
+        message: `${this.title} added to the cart!`,
+        type: 'success',
+      });
+    }
+  }
+
+  onAddToWishlist() {
+    this.addToWishlist.emit();
+    this.toastService.showToast({
+      message: `${this.title} added to the wishlist!`,
+      type: 'success',
+    });
+  }
 }

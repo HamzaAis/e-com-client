@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { ItemCardComponent } from '../../../components/item-card/item-card.component';
 import { CartService } from '../../../services/cart.service';
+import { ToastService } from '../../../services/toast.service';
 import { WishListService } from '../../../services/wish-list.service';
 
 @Component({
@@ -35,6 +36,7 @@ export class WishlistComponent implements OnInit {
 
   constructor(
     private wishListService: WishListService,
+    private toastService: ToastService,
     private cartService: CartService
   ) {}
 
@@ -55,18 +57,23 @@ export class WishlistComponent implements OnInit {
     this.cartService
       .addToCart({
         productId: product.productId,
-        quantity: 1, // Default to 1 for now
+        quantity: 1,
         price: product.price,
-        title: product.title, // New Field
-        image: product.image, // New Field
+        title: product.title,
+        image: product.image,
       })
       .subscribe({
         next: () => {
           this.handleRemoveFromWishlist(product);
-          console.log(`Added ${product.title} to the cart!`);
+          // No success toast here, already handled in ItemCardComponent
         },
-        error: (err: any) =>
-          console.error('Failed to add wish-item to cart', err),
+        error: (err: any) => {
+          console.error('Failed to add wish-item to cart', err);
+          this.toastService.showToast({
+            message: `Failed to move ${product.title} to the cart.`,
+            type: 'error',
+          });
+        },
       });
   }
 
@@ -76,8 +83,15 @@ export class WishlistComponent implements OnInit {
         this.wishlistItems = this.wishlistItems.filter(
           (i) => i.productId !== item.productId
         );
+        // No success toast here, already handled in ItemCardComponent
       },
-      error: (err) => console.error('Failed to remove item from wishlist', err),
+      error: (err) => {
+        console.error('Failed to remove item from wishlist', err);
+        this.toastService.showToast({
+          message: `Failed to remove ${item.title} from the wishlist.`,
+          type: 'error',
+        });
+      },
     });
   }
 }
