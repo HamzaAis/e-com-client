@@ -29,6 +29,10 @@ export const routes: Routes = [
         component: ProductsComponent,
       },
       {
+        path: 'search',
+        component: ProductsComponent,
+      },
+      {
         path: 'cart',
         component: CartComponent,
       },
