@@ -14,18 +14,42 @@ import { ButtonComponent } from '../button/button.component';
       <img [src]="image" [alt]="title" class="h-40 w-full object-cover" />
       <div class="p-4 flex-1">
         <h3 class="font-bold text-lg mb-2">{{ title }}</h3>
-        <p class="text-gray-600 mb-4">{{ price }}</p>
+        <p class="text-gray-600 mb-4">{{ price | currency }}</p>
         <p *ngIf="quantity !== null" class="text-gray-700 font-medium mb-4">
           Quantity: {{ quantity }}
         </p>
       </div>
       <div class="p-4 flex space-x-2">
-        <app-button *ngIf="inCart" variant="danger" (onClick)="onRemove()">
-          Remove
-        </app-button>
+        <!-- Show Add/Remove buttons when NOT in the cart -->
         <ng-container *ngIf="!inCart">
-          <app-button variant="primary" (onClick)="onAddToCart()">
+          <app-button
+            variant="primary"
+            (onClick)="onAddToCart()"
+            [disabled]="stock === 0"
+          >
             Add to Cart
+          </app-button>
+          <app-button variant="danger" (onClick)="onRemove()">
+            Remove
+          </app-button>
+        </ng-container>
+
+        <!-- Show Quantity controls and Remove button when IN the cart -->
+        <ng-container *ngIf="inCart">
+          <app-button
+            variant="danger"
+            (onClick)="onDecreaseQuantity()"
+            [disabled]="quantity! <= 1"
+          >
+            -
+          </app-button>
+          <span class="font-bold text-lg">{{ quantity }}</span>
+          <app-button
+            variant="primary"
+            (onClick)="onIncreaseQuantity()"
+            [disabled]="quantity! >= stock"
+          >
+            +
           </app-button>
           <app-button variant="danger" (onClick)="onRemove()">
             Remove
@@ -42,11 +66,14 @@ export class ItemCardComponent {
   @Input() price: number = 0;
   @Input() quantity: number | null = null;
   @Input() inCart: boolean = false;
+  @Input() stock: number = 0;
 
   constructor(private toastService: ToastService) {}
 
   @Output() addToCart = new EventEmitter<void>();
   @Output() remove = new EventEmitter<void>();
+  @Output() increaseQuantity = new EventEmitter<void>();
+  @Output() decreaseQuantity = new EventEmitter<void>();
 
   onAddToCart() {
     this.addToCart.emit();
@@ -62,5 +89,13 @@ export class ItemCardComponent {
       message: `${this.title} removed successfully!`,
       type: 'info',
     });
+  }
+
+  onIncreaseQuantity() {
+    this.increaseQuantity.emit();
+  }
+
+  onDecreaseQuantity() {
+    this.decreaseQuantity.emit();
   }
 }

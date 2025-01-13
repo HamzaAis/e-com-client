@@ -19,6 +19,7 @@ import { WishListService } from '../../../services/wish-list.service';
             [title]="item.title"
             [image]="item.image"
             [price]="item.price"
+            [stock]="item.stock"
             (addToCart)="handleAddToCart(item)"
             (remove)="handleRemoveFromWishlist(item)"
           ></app-item-card>

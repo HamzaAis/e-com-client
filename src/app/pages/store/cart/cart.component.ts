@@ -20,7 +20,10 @@ import { ToastService } from '../../../services/toast.service';
             [price]="item.price"
             [quantity]="item.quantity"
             [inCart]="true"
+            [stock]="item.stock"
             (remove)="handleRemoveFromCart(item)"
+            (increaseQuantity)="handleIncreaseQuantity(item)"
+            (decreaseQuantity)="handleDecreaseQuantity(item)"
           ></app-item-card>
         </div>
       </ng-container>
@@ -52,21 +55,67 @@ export class CartComponent implements OnInit {
     });
   }
 
-handleRemoveFromCart(item: any) {
-  this.cartService.removeFromCart(item.productId).subscribe({
-    next: () => {
-      this.cartItems = this.cartItems.filter(
-        (i) => i.productId !== item.productId
-      );
-      // No success toast here, already handled in ItemCardComponent
-    },
-    error: (err) => {
-      console.error('Failed to remove item from cart', err);
+  handleRemoveFromCart(item: any) {
+    this.cartService.removeFromCart(item.productId).subscribe({
+      next: () => {
+        this.cartItems = this.cartItems.filter(
+          (i) => i.productId !== item.productId
+        );
+        this.toastService.showToast({
+          message: `${item.title} removed from the cart.`,
+          type: 'info',
+        });
+      },
+      error: (err) => {
+        console.error('Failed to remove item from cart', err);
+        this.toastService.showToast({
+          message: 'Failed to remove item from the cart.',
+          type: 'error',
+        });
+      },
+    });
+  }
+
+  handleIncreaseQuantity(item: any) {
+    if (item.quantity >= item.stock) {
       this.toastService.showToast({
-        message: 'Failed to remove item from the cart.',
-        type: 'error',
+        message: `Cannot add more than ${item.stock} items.`,
+        type: 'warning',
       });
-    },
-  });
-}
+      return;
+    }
+
+    this.cartService.updateProductQuantity(item.productId, 1).subscribe({
+      next: () => {
+        item.quantity += 1;
+      },
+      error: (err) => {
+        console.error('Failed to increase quantity', err);
+        this.toastService.showToast({
+          message: 'Failed to increase quantity.',
+          type: 'error',
+        });
+      },
+    });
+  }
+
+  handleDecreaseQuantity(item: any) {
+    if (item.quantity <= 1) {
+      this.handleRemoveFromCart(item);
+      return;
+    }
+
+    this.cartService.updateProductQuantity(item.productId, -1).subscribe({
+      next: () => {
+        item.quantity -= 1;
+      },
+      error: (err) => {
+        console.error('Failed to decrease quantity', err);
+        this.toastService.showToast({
+          message: 'Failed to decrease quantity.',
+          type: 'error',
+        });
+      },
+    });
+  }
 }

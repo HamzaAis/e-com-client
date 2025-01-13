@@ -28,6 +28,20 @@ export class CartService {
     return this.http.get<{ items: any[] }>(`${this.baseUrl}/${userId}`);
   }
 
+  updateProductQuantity(
+    productId: number,
+    quantityChange: number
+  ): Observable<any> {
+    const userId = this.getUserIdOrThrow();
+    return this.http.put(
+      `${this.baseUrl}/${userId}/update-quantity/${productId}`,
+      null,
+      {
+        params: { quantity: quantityChange.toString() },
+      }
+    );
+  }
+
   addToCart(cartItem: {
     productId: number;
     quantity: number;
