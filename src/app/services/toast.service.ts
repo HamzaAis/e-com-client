@@ -5,6 +5,7 @@ export interface Toast {
   message: string;
   type: 'success' | 'error' | 'info' | 'warning';
   duration?: number; // in milliseconds
+  createdAt: number; // timestamp
 }
 
 @Injectable({
@@ -14,12 +15,16 @@ export class ToastService {
   private toastsSubject = new BehaviorSubject<Toast[]>([]);
   toasts$ = this.toastsSubject.asObservable();
 
-  showToast(toast: Toast) {
+  showToast(toast: Omit<Toast, 'createdAt'>) {
+    const newToast: Toast = {
+      ...toast,
+      createdAt: Date.now(), // Add the current timestamp
+    };
     const currentToasts = this.toastsSubject.getValue();
-    this.toastsSubject.next([...currentToasts, toast]);
+    this.toastsSubject.next([...currentToasts, newToast]);
 
-    if (toast.duration !== 0) {
-      setTimeout(() => this.dismissToast(toast), toast.duration || 3000);
+    if (newToast.duration !== 0) {
+      setTimeout(() => this.dismissToast(newToast), newToast.duration || 3000);
     }
   }
 

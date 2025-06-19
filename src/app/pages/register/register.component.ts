@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import {
   AbstractControl,
   FormBuilder,
@@ -552,10 +552,11 @@ import { ToastService } from '../../services/toast.service';
   `,
   styles: [],
 })
-export class RegisterComponent {
+export class RegisterComponent implements OnInit {
   form: FormGroup;
   isSubmitted: boolean = false;
   step = 1;
+  isLoading = false; // Add loading state
 
   isPasswordVisible = false;
   isConfirmPasswordVisible = false;
@@ -573,7 +574,7 @@ export class RegisterComponent {
         firstName: ['', Validators.required],
         lastName: ['', Validators.required],
         username: ['', Validators.required],
-        phoneNumber: ['', Validators.required],
+        phoneNumber: ['', [Validators.required, this.phoneNumberValidator()]],
         email: ['', [Validators.required, Validators.email]],
         password: [
           '',
@@ -602,9 +603,17 @@ export class RegisterComponent {
     }
   }
 
+  phoneNumberValidator(): ValidatorFn {
+    return (control: AbstractControl): { [key: string]: any } | null => {
+      const phoneNumberPattern = /^[0-9]{10}$/; // Example pattern for a 10-digit phone number
+      const isValid = phoneNumberPattern.test(control.value);
+      return isValid ? null : { invalidPhoneNumber: true };
+    };
+  }
+
   autoFocusNextOrStep(fieldName: string, nextStep = false): void {
     if (nextStep) {
-      this.nextStep(); // Trigger the next step logic
+      this.nextStep();
       const firstControlOfNextStep = this.getControlsForStep(this.step)[0];
       if (firstControlOfNextStep) {
         const controlId = firstControlOfNextStep?.get('id')?.value;
@@ -619,7 +628,7 @@ export class RegisterComponent {
   }
 
   get progressPercentage(): string {
-    return `${(this.step / 4) * 100}%`; // Adjust "4" to your total number of steps
+    return `${(this.step / 4) * 100}%`;
   }
 
   get passwordStrength(): string {
@@ -710,27 +719,25 @@ export class RegisterComponent {
   onSubmit() {
     this.isSubmitted = true;
     if (this.form.valid) {
+      this.isLoading = true; // Show loading spinner
       this.service.signUp(this.form.value).subscribe({
         next: () => {
           this.toastService.showToast({
             message: 'Registration successful! Please log in.',
             type: 'success',
           });
-          console.log(
-            'Toast triggered: Registration successful! Please log in!'
-          );
-
           this.router.navigateByUrl('/login');
         },
         error: (err: any) => {
+          this.isLoading = false; // Hide loading spinner
           this.toastService.showToast({
             message: 'Registration failed. Please try again.',
             type: 'error',
           });
           console.error('Registration error:', err);
-          console.log(
-            'Toast triggered: Registration failed. Please try again!'
-          );
+        },
+        complete: () => {
+          this.isLoading = false; // Hide loading spinner
         },
       });
     } else {
@@ -738,7 +745,6 @@ export class RegisterComponent {
         message: 'Please fill in all required fields.',
         type: 'warning',
       });
-      console.log('Toast triggered: Please fill in all required fields!');
     }
   }
 

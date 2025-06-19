@@ -11,66 +11,42 @@ import { ProductService } from '../../../services/product.service';
   template: `
     <div class="min-h-screen bg-gray-50 p-6">
       <div class="max-w-7xl mx-auto">
-        <!-- Search Header -->
         <h2 class="text-2xl font-semibold text-gray-800 mb-4">
           Search Results for "<span class="text-blue-600">{{
             searchQuery
           }}</span
           >"
         </h2>
-
-        <!-- Error Message -->
-        <div *ngIf="errorMessage" class="text-red-500 mb-4">
-          {{ errorMessage }}
-        </div>
-
-        <!-- Filters -->
         <div class="flex items-center space-x-4 mb-6">
-          <label>
-            Sort by:
-            <select
-              [(ngModel)]="sort"
-              (change)="fetchSearchResults()"
-              class="px-4 py-2 rounded-md"
-            >
-              <option value="title">Title</option>
-              <option value="price">Price</option>
-              <option value="stock">Stock</option>
-            </select>
-          </label>
-          <label>
-            Order:
-            <select
-              [(ngModel)]="order"
-              (change)="fetchSearchResults()"
-              class="px-4 py-2 rounded-md"
-            >
-              <option value="asc">Ascending</option>
-              <option value="desc">Descending</option>
-            </select>
-          </label>
+          <input
+            type="text"
+            [(ngModel)]="searchQuery"
+            (input)="onSearchInput()"
+            class="px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
+            placeholder="Search products..."
+          />
+          <button
+            class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+            (click)="clearSearch()"
+          >
+            Clear
+          </button>
         </div>
-
-        <!-- Loading Skeleton -->
         <div
           *ngIf="isLoading"
           class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
         >
           <div
             *ngFor="let loader of skeletonLoaders"
-            class="bg-gray-200 h-60 rounded-md"
+            class="bg-gray-200 h-60 rounded-md animate-pulse"
           ></div>
         </div>
-
-        <!-- Empty State -->
         <div *ngIf="!isLoading && products.length === 0" class="text-gray-500">
           No products found matching "<span class="font-semibold">{{
             searchQuery
           }}</span
           >".
         </div>
-
-        <!-- Product List -->
         <div
           *ngIf="!isLoading && products.length > 0"
           class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
@@ -87,9 +63,6 @@ import { ProductService } from '../../../services/product.service';
             <h3 class="text-lg font-medium text-gray-700 truncate">
               {{ product.title }}
             </h3>
-            <p class="text-gray-600 text-sm mb-2 truncate">
-              {{ product.description }}
-            </p>
             <p class="text-blue-600 font-semibold mb-2">
               \${{ product.price }}
             </p>
@@ -101,8 +74,6 @@ import { ProductService } from '../../../services/product.service';
             </button>
           </div>
         </div>
-
-        <!-- Pagination -->
         <div class="mt-6 flex justify-center">
           <button
             *ngIf="page > 1"
@@ -175,6 +146,17 @@ export class SearchResultComponent implements OnInit {
           this.isLoading = false;
         },
       });
+  }
+
+  onSearchInput(): void {
+    this.page = 1;
+    this.fetchSearchResults();
+  }
+
+  clearSearch(): void {
+    this.searchQuery = '';
+    this.page = 1;
+    this.fetchSearchResults();
   }
 
   changePage(newPage: number): void {

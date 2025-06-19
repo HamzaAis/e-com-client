@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { ItemCardComponent } from '../../../components/item-card/item-card.component';
 import { CartService } from '../../../services/cart.service';
 import { ToastService } from '../../../services/toast.service';
@@ -26,9 +27,28 @@ import { ToastService } from '../../../services/toast.service';
             (decreaseQuantity)="handleDecreaseQuantity(item)"
           ></app-item-card>
         </div>
+        <div class="mt-6 p-4 bg-gray-50 rounded-lg">
+          <p class="text-xl font-semibold">
+            Total: {{ getTotalPrice() | currency }}
+          </p>
+          <button
+            class="mt-4 w-full px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
+            (click)="handleCheckout()"
+          >
+            Proceed to Checkout
+          </button>
+        </div>
       </ng-container>
       <ng-template #emptyCart>
-        <p class="text-gray-500 text-center">Your cart is empty.</p>
+        <div class="text-center py-12">
+          <p class="text-gray-500 text-lg mb-4">Your cart is empty.</p>
+          <button
+            class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+            (click)="navigateToProducts()"
+          >
+            Continue Shopping
+          </button>
+        </div>
       </ng-template>
     </div>
   `,
@@ -36,10 +56,12 @@ import { ToastService } from '../../../services/toast.service';
 })
 export class CartComponent implements OnInit {
   cartItems: any[] = [];
+  isLoading: boolean = false;
 
   constructor(
     private cartService: CartService,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -47,12 +69,24 @@ export class CartComponent implements OnInit {
   }
 
   loadCartItems() {
+    this.isLoading = true;
     this.cartService.getCart().subscribe({
       next: (res) => {
         this.cartItems = res.items || [];
+        this.isLoading = false;
       },
-      error: (err) => console.error('Failed to load cart items', err),
+      error: (err) => {
+        console.error('Failed to load cart items', err);
+        this.isLoading = false;
+      },
     });
+  }
+
+  getTotalPrice(): number {
+    return this.cartItems.reduce(
+      (total, item) => total + item.price * item.quantity,
+      0
+    );
   }
 
   handleRemoveFromCart(item: any) {
@@ -117,5 +151,13 @@ export class CartComponent implements OnInit {
         });
       },
     });
+  }
+
+  handleCheckout() {
+    this.router.navigate(['/checkout']);
+  }
+
+  navigateToProducts() {
+    this.router.navigate(['/store/products']);
   }
 }

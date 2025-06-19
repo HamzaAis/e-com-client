@@ -21,6 +21,11 @@ import { Toast, ToastService } from '../../services/toast.service';
         >
           ✖
         </button>
+        <div
+          *ngIf="toast.duration !== 0"
+          class="absolute bottom-0 left-0 h-1 bg-white bg-opacity-50"
+          [style.width]="progressWidth(toast)"
+        ></div>
       </div>
     </div>
   `,
@@ -50,6 +55,13 @@ export class ToastComponent {
 
   getToastClass(type: string): string {
     return `toast-${type}`;
+  }
+
+  progressWidth(toast: Toast): string {
+    if (toast.duration === 0) return '0%';
+    const elapsed = Date.now() - toast.createdAt;
+    const remaining = Math.max(0, (toast.duration || 3000) - elapsed); // Default duration if undefined
+    return `${(remaining / (toast.duration || 3000)) * 100}%`;
   }
 
   dismissToast(toast: Toast) {

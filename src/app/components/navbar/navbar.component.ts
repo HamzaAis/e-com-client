@@ -9,20 +9,18 @@ import { ToastService } from '../../services/toast.service';
 
 @Component({
   selector: 'app-navbar',
+  standalone: true,
   imports: [RouterModule, CommonModule, FormsModule],
   template: `
     <nav
       class="flex items-center justify-between px-6 py-4 bg-blue-500 text-white sticky top-0 z-10"
     >
-      <!-- Store Name -->
       <button
         class="text-lg font-semibold hover:underline"
         (click)="navigateTo('/')"
       >
         MyStore
       </button>
-
-      <!-- Navigation Links -->
       <ul class="flex items-center space-x-6">
         <ng-container *ngIf="!isLoggedIn; else loggedInLinks">
           <li>
@@ -37,7 +35,6 @@ import { ToastService } from '../../services/toast.service';
           </li>
         </ng-container>
         <ng-template #loggedInLinks>
-          <!-- Search Bar -->
           <div class="relative flex items-center">
             <input
               type="text"
@@ -52,8 +49,13 @@ import { ToastService } from '../../services/toast.service';
             >
               Search
             </button>
-
-            <!-- Suggestions Dropdown -->
+            <button
+              *ngIf="searchQuery"
+              class="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 focus:outline-none ml-2"
+              (click)="clearSearch()"
+            >
+              Clear
+            </button>
             <div
               *ngIf="suggestions.length > 0 && showSuggestions"
               class="absolute top-12 left-0 w-full bg-white text-black rounded-lg shadow-lg max-h-48 overflow-y-auto z-20"
@@ -115,12 +117,10 @@ export class NavbarComponent {
     private productService: ProductService,
     private router: Router
   ) {
-    // Subscribe to login state
     this.accountService.isLoggedIn$.subscribe((status) => {
       this.isLoggedIn = status;
     });
 
-    // Debounced search handler
     this.searchSubject
       .pipe(debounceTime(300), distinctUntilChanged())
       .subscribe((query) => {
@@ -148,6 +148,12 @@ export class NavbarComponent {
       });
       this.resetSuggestions();
     }
+  }
+
+  clearSearch(): void {
+    this.searchQuery = '';
+    this.suggestions = [];
+    this.showSuggestions = false;
   }
 
   selectSuggestion(product: any): void {
