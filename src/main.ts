@@ -5,15 +5,12 @@ import { provideRouter } from '@angular/router';
 
 import { AppComponent } from './app/app.component';
 import { routes } from './app/app.routes';
-import { environment } from './environments/environment';
+import { environment } from './app/logic/environments/environment';
 
 if (environment.production) {
   enableProdMode();
 }
 
 bootstrapApplication(AppComponent, {
-  providers: [
-    provideRouter(routes),
-    provideHttpClient(),
-  ],
+  providers: [provideRouter(routes), provideHttpClient()],
 }).catch((err) => console.error(err));
