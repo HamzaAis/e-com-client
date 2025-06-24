@@ -1,12 +1,11 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { ToastService } from '../../../logic/services/toast.service';
-import { ButtonComponent } from '../button/button.component';
 
 @Component({
   selector: 'app-card',
   standalone: true,
-  imports: [ButtonComponent, CommonModule],
+  imports: [CommonModule],
   template: `
     <div
       class="border rounded-lg shadow-md overflow-hidden bg-white flex flex-col"
@@ -28,16 +27,16 @@ import { ButtonComponent } from '../button/button.component';
           </p>
         </div>
         <div class="p-4 flex space-x-2">
-          <app-button
+          <button
             variant="primary"
             (onClick)="onAddToCart()"
             [disabled]="stock === 0"
           >
             Add to Cart
-          </app-button>
-          <app-button variant="secondary" (onClick)="onAddToWishlist()">
+          </button>
+          <button variant="secondary" (onClick)="onAddToWishlist()">
             Add to Wishlist
-          </app-button>
+          </button>
         </div>
       </ng-container>
     </div>
@@ -62,7 +61,7 @@ export class CardComponent {
       this.toastService.showToast({
         message: `${this.title} added to the cart!`,
         type: 'success',
-        duration: 3000, // Optional: Add duration if needed
+        duration: 3000, 
       });
     }
   }
@@ -72,7 +71,7 @@ export class CardComponent {
     this.toastService.showToast({
       message: `${this.title} added to the wishlist!`,
       type: 'success',
-      duration: 3000, // Optional: Add duration if needed
+      duration: 3000,
     });
   }
 }

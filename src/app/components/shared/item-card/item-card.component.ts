@@ -1,12 +1,11 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { ToastService } from '../../../logic/services/toast.service';
-import { ButtonComponent } from '../button/button.component';
 
 @Component({
   selector: 'app-item-card',
   standalone: true,
-  imports: [ButtonComponent, CommonModule],
+  imports: [CommonModule],
   template: `
     <div
       class="border rounded-lg shadow-md overflow-hidden bg-white flex flex-col"
@@ -26,36 +25,36 @@ import { ButtonComponent } from '../button/button.component';
         </div>
         <div class="p-4 flex space-x-2">
           <ng-container *ngIf="!inCart">
-            <app-button
+            <button
               variant="primary"
               (onClick)="onAddToCart()"
               [disabled]="stock === 0"
             >
               Add to Cart
-            </app-button>
-            <app-button variant="danger" (onClick)="onRemove()">
+            </button>
+            <button variant="danger" (onClick)="onRemove()">
               Remove
-            </app-button>
+            </button>
           </ng-container>
           <ng-container *ngIf="inCart">
-            <app-button
+            <button
               variant="danger"
               (onClick)="onDecreaseQuantity()"
               [disabled]="quantity! <= 1"
             >
               -
-            </app-button>
+            </button>
             <span class="font-bold text-lg">{{ quantity }}</span>
-            <app-button
+            <button
               variant="primary"
               (onClick)="onIncreaseQuantity()"
               [disabled]="quantity! >= stock"
             >
               +
-            </app-button>
-            <app-button variant="danger" (onClick)="onRemove()">
+            </button>
+            <button variant="danger" (onClick)="onRemove()">
               Remove
-            </app-button>
+            </button>
           </ng-container>
         </div>
       </ng-container>
