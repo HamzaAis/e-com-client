@@ -9,12 +9,7 @@ import { AuthResponseDto } from '../interfaces/AuthResponseDto';
 import { LoginRequest } from '../interfaces/LoginRequest';
 import { RefreshTokenRequest } from '../interfaces/RefreshTokenRequest';
 import { RegisterRequest } from '../interfaces/RegisterRequest';
-
-export interface UserInfo {
-  userId: string | null;
-  username: string | null;
-  roles: string[];
-}
+import { UserInfo } from '../interfaces/UserInfo';
 
 @Injectable({ providedIn: 'root' })
 export class AccountService {

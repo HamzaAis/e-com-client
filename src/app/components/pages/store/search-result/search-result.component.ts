@@ -136,7 +136,7 @@ export class SearchResultComponent implements OnInit {
       })
       .subscribe({
         next: (res) => {
-          this.products = res.data;
+          // this.products = res.data;
           this.isLoading = false;
         },
         error: (err) => {
